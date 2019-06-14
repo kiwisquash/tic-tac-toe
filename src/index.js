@@ -43,14 +43,17 @@ class Status extends React.Component {
 		const victory = this.props.victory;
 
 		if (victory) {
-			status = currentTurn(step - 1) + " won";
+			status = currentTurn(step - 1) + " wins";
 		} else if (step > 8 ) {
 			status = "It is a draw"
 		} else {
-			status = ((step)? currentTurn(step) +"'s turn" :"Hello world");
+			status = "It is " + currentTurn(step) +"'s turn";
 		}
 		return (
-			<h1>{status}</h1>
+			<div>
+				<h1>Welcome to Tic-Tac-Toe</h1>
+				<h2>{status}</h2>
+			</div>
 		)
 	}
 }
