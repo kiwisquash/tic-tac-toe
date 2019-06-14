@@ -38,7 +38,17 @@ class Board extends React.Component {
 
 class Status extends React.Component {
 	render() {
-		let status = "Hello world";
+		let status;
+		const	step = this.props.step;
+		const victory = this.props.victory;
+
+		if (victory) {
+			status = currentTurn(step - 1) + " won";
+		} else if (step > 8 ) {
+			status = "It is a draw"
+		} else {
+			status = ((step)? currentTurn(step) +"'s turn" :"Hello world");
+		}
 		return (
 			<h1>{status}</h1>
 		)
@@ -55,21 +65,84 @@ class Game extends React.Component {
 		// this.currentTurn = this.currentTurn.bind(this);
 		this.handleClick = this.handleClick.bind(this);
 	}
-	
-	currentTurn() {
-		return "0";
+
+	isFilled(i,j) {
+		return Boolean(this.state.currentBoard[i+3*j])
+	}
+
+	arrIndex(i,j) {
+		return i + 3*j
+	}
+
+	victoryCheck() {
+		const currentBoard = this.state.currentBoard;
+		let val;
+
+		val = currentBoard[this.arrIndex(0,0)]
+		if (val) {
+			for (let i = 0; i < 3; i++) {
+					if (val !== currentBoard[this.arrIndex(i,i)]) {
+						break;
+					} 
+					if (i===2) {
+						return true; 
+					}
+			}	
+		}
+		
+		val = currentBoard[this.arrIndex(0,2)]
+		if (val) {
+			for (let i = 0; i < 3; i++) {
+					if (val !== currentBoard[this.arrIndex(i,2-i)]) {
+						break;
+					}
+					if (i===2) {
+						return true; 
+					}
+		  }	
+		}
+
+		for (let i = 0; i < 3; i++) {
+			val = currentBoard[this.arrIndex(i,0)]
+			if (val) {
+				for (let j = 0; j < 3; j++) {
+					if (val !== currentBoard[this.arrIndex(i,j)]) {
+						break;
+					} 
+					if (j===2) {
+						return true;
+					}
+				}
+			}
+		}
+
+		for (let i = 0; i < 3; i++) {
+			val = currentBoard[this.arrIndex(0,i)]
+			if (val) {
+				for (let j = 0; j < 3; j++) {
+					if (val !== currentBoard[this.arrIndex(j,i)]) {
+						break;
+					} 
+					if (j===2) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	handleClick(i,j) {
-		console.log(this.state.currentStep);
 		const currentStep = this.state.currentStep;
 		const currentBoard = this.state.currentBoard.slice();
-		currentBoard[i+3*j] = 0; 
+		if (this.isFilled(i,j)||this.victoryCheck()) {
+			return
+		}
+		currentBoard[this.arrIndex(i,j)] = currentTurn(currentStep); 
 		this.setState({
 			currentBoard: currentBoard,
 			currentStep: currentStep + 1
 		})
-		console.log(this.state.currentStep);
 	}
 
 	render() {
@@ -79,7 +152,7 @@ class Game extends React.Component {
 
 		return (
 			<div className="game">
-				<Status/>
+				<Status step={this.state.currentStep} victory={this.victoryCheck()}/>
 				<Board onClick={(i,j)=>this.handleClick(i,j)} squares={currentBoard}/>
 			</div>
 		)
@@ -90,3 +163,8 @@ ReactDOM.render(
 	<Game/>,
 	document.getElementById("root")
 )
+
+function currentTurn(step) {
+	return ((step % 2 === 0) ? "O":"X");
+ }
+
